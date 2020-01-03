@@ -148,13 +148,21 @@ class DatabricksHook(BaseHook):
         """
         method, endpoint = endpoint_info
 
-        if 'token' in self.databricks_conn.extra_dejson:
-            self.log.info('Using token auth. ')
+        if self.databricks_conn.login = 'token':
+            self.log.info('Using token auth. from password field')
+            auth = _TokenAuth(self.databricks_conn.password)
+        elif 'token' in self.databricks_conn.extra_dejson:
+            self.log.info('Using token auth. from extra json')
             auth = _TokenAuth(self.databricks_conn.extra_dejson['token'])
-            host = self._parse_host(self.databricks_conn.extra_dejson['host'])
         else:
             self.log.info('Using basic auth. ')
             auth = (self.databricks_conn.login, self.databricks_conn.password)
+            
+        if 'host' in self.databricks_conn.extra_dejson:
+            self.log.info('Using host from extra json')
+            host = self.databricks_conn.extra_dejson['host']
+        elif '':
+            self.log.info('Using host from host field')
             host = self.databricks_conn.host
 
         url = 'https://{host}/{endpoint}'.format(
